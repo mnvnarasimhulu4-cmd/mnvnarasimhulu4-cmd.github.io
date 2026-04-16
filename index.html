@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Premium Smart Weather App</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 15px 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    input {
+      padding: 12px;
+      width: 60%;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      padding: 12px 15px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+      background: #ff9800;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #e68900;
+    }
+
+    .big-temp {
+      font-size: 60px;
+      font-weight: bold;
+    }
+
+    .hour-container {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .hour-box {
+      background: rgba(255,255,255,0.2);
+      margin: 5px;
+      padding: 12px;
+      border-radius: 15px;
+      min-width: 90px;
+    }
+
+    .forecast-container {
+      display: flex;
+      overflow-x: auto;
+    }
+
+    .forecast-box {
+      background: rgba(255,255,255,0.2);
+      margin: 5px;
+      padding: 12px;
+      border-radius: 15px;
+      min-width: 110px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .forecast-box:hover {
+      transform: scale(1.05);
+    }
+
+    .active-day {
+      border: 2px solid yellow;
+    }
+
+    #forecast {
+      display: none;
+    }
+
+    .ad-box {
+      display: none;
+      background: yellow;
+      color: black;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🌤 Premium Weather App</h1>
+
+  <input id="city" placeholder="Enter city">
+  <br>
+  <button onclick="getWeather()">Search</button>
+
+  <div class="card">
+    <h2 id="cityName"></h2>
+    <div class="big-temp" id="temp"></div>
+    <h3 id="condition"></h3>
+  </div>
+
+  <div class="card" id="data"></div>
+
+  <button onclick="unlockForecast()">🔓 Unlock 5-Day Forecast</button>
+
+  <div class="ad-box" id="adSection">
+    💰 Advertisement Area
+  </div>
+
+  <div class="card" id="forecast"></div>
+
+</div>
+
+<script>
+let apiKey = "3ebe83128feab32f2228c13395d83ea0";
+let fullForecastData = [];
+
+// 🌧️ Rain alert
+function checkRain(data) {
+  for (let i = 0; i < 8; i++) {
+    if ((data.list[i].pop || 0) > 0.6) {
+      alert("⚠️ Rain expected!");
+      break;
+    }
+  }
+}
+
+// ⏱️ Today hourly
+function showHourly(list) {
+  let div = document.getElementById("data");
+  div.innerHTML = "<h3>⏱️ Today</h3><div class='hour-container'>";
+
+  for (let i = 0; i < 8; i++) {
+    let item = list[i];
+    let time = new Date(item.dt_txt).toLocaleTimeString([], {hour:'2-digit'});
+    let temp = item.main.temp;
+    let rain = Math.round((item.pop || 0) * 100);
+
+    div.innerHTML += `
+      <div class="hour-box">
+        <p>${time}</p>
+        <p>🌡 ${temp}°C</p>
+        <p>🌧️ ${rain}%</p>
+      </div>
+    `;
+  }
+
+  div.innerHTML += "</div>";
+}
+
+// 📅 Forecast clickable
+function showForecast(list) {
+  let div = document.getElementById("forecast");
+  div.innerHTML = "<div class='forecast-container'>";
+
+  for (let i = 0; i < list.length; i += 8) {
+    let item = list[i];
+    let date = item.dt_txt.split(" ")[0];
+
+    div.innerHTML += `
+      <div class="forecast-box" onclick="showDayDetails('${date}', this)">
+        <p>${new Date(item.dt_txt).toDateString()}</p>
+        <p>🌡 ${item.main.temp}°C</p>
+        <p>🌧️ ${Math.round((item.pop || 0)*100)}%</p>
+      </div>
+    `;
+  }
+
+  div.innerHTML += "</div>";
+}
+
+// 🔥 Click → show that day
+function showDayDetails(date, element) {
+
+  document.querySelectorAll(".forecast-box").forEach(el => el.classList.remove("active-day"));
+  element.classList.add("active-day");
+
+  let div = document.getElementById("data");
+  div.innerHTML = `<h3>⏱️ ${date}</h3><div class='hour-container'>`;
+
+  fullForecastData.forEach(item => {
+    if (item.dt_txt.startsWith(date)) {
+      let time = new Date(item.dt_txt).toLocaleTimeString([], {hour:'2-digit'});
+      let temp = item.main.temp;
+      let rain = Math.round((item.pop || 0) * 100);
+
+      div.innerHTML += `
+        <div class="hour-box">
+          <p>${time}</p>
+          <p>🌡 ${temp}°C</p>
+          <p>🌧️ ${rain}%</p>
+        </div>
+      `;
+    }
+  });
+
+  div.innerHTML += "</div>";
+}
+
+// 🔓 Unlock forecast
+function unlockForecast() {
+  document.getElementById("adSection").style.display = "block";
+
+  setTimeout(() => {
+    document.getElementById("forecast").style.display = "block";
+  }, 2000);
+}
+
+// 🔍 Search
+async function getWeather() {
+  let city = document.getElementById("city").value;
+
+  let res1 = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+  let data1 = await res1.json();
+
+  document.getElementById("cityName").innerText = data1.name || city;
+  document.getElementById("temp").innerText = data1.main.temp + "°C";
+  document.getElementById("condition").innerText = data1.weather[0].description;
+
+  let res2 = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+  let data2 = await res2.json();
+
+  if (data2.cod != "200") return;
+
+  fullForecastData = data2.list;
+
+  checkRain(data2);
+  showHourly(data2.list);
+  showForecast(data2.list);
+
+  document.getElementById("forecast").style.display = "none";
+}
+</script>
+
+</body>
+</html>
