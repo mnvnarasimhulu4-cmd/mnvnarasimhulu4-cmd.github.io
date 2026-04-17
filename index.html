@@ -109,13 +109,12 @@
       border-radius: 10px;
     }
 
-    /* ✅ NEW CONTENT STYLE */
     .content {
       background: white;
       color: black;
       padding: 20px;
       border-radius: 15px;
-      margin-top: 30px;
+      margin-top: 20px;
       text-align: left;
       max-width: 800px;
       margin-left: auto;
@@ -131,6 +130,27 @@
 
   <h1>🌤 Premium Weather App</h1>
 
+  <!-- ✅ CONTENT FIRST (FIXED) -->
+  <div class="content">
+
+    <h2>About This Weather App</h2>
+    <p>
+    This smart weather application provides real-time weather updates including temperature, humidity, and rain probability. It helps users plan their daily activities with accurate forecasts and easy-to-read data.
+    </p>
+
+    <h2>How Weather Forecast Works</h2>
+    <p>
+    The app collects live weather data from reliable sources and displays it in a simple format. Users can check current weather, hourly updates, and 5-day forecasts easily for any city.
+    </p>
+
+    <h2>Why Use This App?</h2>
+    <p>
+    This app is fast, simple, and useful for everyone. Whether you are planning a trip, going to work, or checking rain conditions, this tool helps you make better decisions.
+    </p>
+
+  </div>
+
+  <!-- WEATHER SECTION -->
   <input id="city" placeholder="Enter city">
   <br>
   <button onclick="getWeather()">Search</button>
@@ -153,31 +173,10 @@
 
 </div>
 
-<!-- ✅ NEW CONTENT (ADSENSE FIX) -->
-<div class="content">
-
-<h2>About This Weather App</h2>
-<p>
-This smart weather application provides real-time weather updates including temperature, humidity, and rain probability. It helps users plan their daily activities with accurate forecasts and easy-to-read data.
-</p>
-
-<h2>How Weather Forecast Works</h2>
-<p>
-The app collects live weather data from reliable sources and displays it in a simple format. Users can check current weather, hourly updates, and 5-day forecasts easily for any city.
-</p>
-
-<h2>Why Use This App?</h2>
-<p>
-This app is fast, simple, and useful for everyone. Whether you are planning a trip, going to work, or checking rain conditions, this tool helps you make better decisions.
-</p>
-
-</div>
-
 <script>
 let apiKey = "3ebe83128feab32f2228c13395d83ea0";
 let fullForecastData = [];
 
-// 🌧️ Rain alert
 function checkRain(data) {
   for (let i = 0; i < 8; i++) {
     if ((data.list[i].pop || 0) > 0.6) {
@@ -187,7 +186,6 @@ function checkRain(data) {
   }
 }
 
-// ⏱️ Today hourly
 function showHourly(list) {
   let div = document.getElementById("data");
   div.innerHTML = "<h3>⏱️ Today</h3><div class='hour-container'>";
@@ -210,7 +208,6 @@ function showHourly(list) {
   div.innerHTML += "</div>";
 }
 
-// 📅 Forecast clickable
 function showForecast(list) {
   let div = document.getElementById("forecast");
   div.innerHTML = "<div class='forecast-container'>";
@@ -231,9 +228,7 @@ function showForecast(list) {
   div.innerHTML += "</div>";
 }
 
-// 🔥 Click → show that day
 function showDayDetails(date, element) {
-
   document.querySelectorAll(".forecast-box").forEach(el => el.classList.remove("active-day"));
   element.classList.add("active-day");
 
@@ -259,16 +254,13 @@ function showDayDetails(date, element) {
   div.innerHTML += "</div>";
 }
 
-// 🔓 Unlock forecast
 function unlockForecast() {
   document.getElementById("adSection").style.display = "block";
-
   setTimeout(() => {
     document.getElementById("forecast").style.display = "block";
   }, 2000);
 }
 
-// 🔍 Search
 async function getWeather() {
   let city = document.getElementById("city").value;
 
@@ -299,8 +291,8 @@ async function getWeather() {
   <a href="about.html">About</a> |
   <a href="contact.html">Contact</a> |
   <a href="privacy.html">Privacy</a> |
-  <a href="terms.html">Terms</a>
-  <a href="blog.html">Blog</a> |
+  <a href="terms.html">Terms</a> |
+  <a href="blog.html">Blog</a>
 </footer>
 
 </body>
